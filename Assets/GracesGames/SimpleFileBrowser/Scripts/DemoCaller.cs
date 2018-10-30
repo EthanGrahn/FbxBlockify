@@ -37,7 +37,7 @@ namespace GracesGames.SimpleFileBrowser.Scripts {
 
 			GameObject uiCanvas = GameObject.Find("Canvas");
 			if (uiCanvas == null) {
-				Debug.LogError("Make sure there is a canvas GameObject present in the Hierarcy (Create UI/Canvas)");
+				Debug.LogError("Make sure there is a canvas GameObject present in the hierarchy (Create UI/Canvas)");
 			}
 		}
 
