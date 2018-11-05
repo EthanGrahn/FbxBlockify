@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class MeshDebug : MonoBehaviour
 {
 	private Mesh mesh;
 	public GameObject testObject;
+	public List<Color> vertColors = new List<Color>();
 
 	private Texture2D m_MainTexture;
 	private Color vertexColor = Color.black;
@@ -16,18 +16,21 @@ public class MeshDebug : MonoBehaviour
 	void Start ()
 	{
 		mesh = GetComponent<MeshFilter>().mesh;
+		
 		testObject.GetComponent<TestSphere>().collisionEvent.AddListener(SphereCollide);
 		m_MainTexture = GetComponent<MeshRenderer>().material.mainTexture as Texture2D;
+		StartCoroutine(TestPoints());
 	}
 
-	private async void TestPoints()
+	private IEnumerator TestPoints()
 	{
 		Vector3[] verts = mesh.vertices;
-
+		Debug.Log(verts.Length);
 		for (int i = 0; i < verts.Length; ++i)
 		{
-			testObject.transform.position = new Vector3(verts[i].x, verts[i].y, verts[i].z);
-			await Task.Delay(5);
+			testObject.transform.position = transform.TransformPoint(new Vector3(verts[i].x, verts[i].y, verts[i].z));
+			yield return new WaitForEndOfFrame();
+			vertColors.Add(vertexColor);
 		}
 	}
 
