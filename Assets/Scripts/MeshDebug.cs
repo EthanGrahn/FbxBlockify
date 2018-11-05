@@ -11,11 +11,13 @@ public class MeshDebug : MonoBehaviour
 
 	private Texture2D m_MainTexture;
 	private Color vertexColor = Color.black;
+	private MeshCollider _collider;
 	
 	// Use this for initialization
 	void Start ()
 	{
 		mesh = GetComponent<MeshFilter>().mesh;
+		_collider = GetComponent<MeshCollider>();
 		
 		testObject.GetComponent<TestSphere>().collisionEvent.AddListener(SphereCollide);
 		m_MainTexture = GetComponent<MeshRenderer>().material.mainTexture as Texture2D;
@@ -25,11 +27,10 @@ public class MeshDebug : MonoBehaviour
 	private IEnumerator TestPoints()
 	{
 		Vector3[] verts = mesh.vertices;
-		Debug.Log(verts.Length);
 		for (int i = 0; i < verts.Length; ++i)
 		{
 			testObject.transform.position = transform.TransformPoint(new Vector3(verts[i].x, verts[i].y, verts[i].z));
-			yield return new WaitForEndOfFrame();
+			yield return new WaitForFixedUpdate();
 			vertColors.Add(vertexColor);
 		}
 	}
@@ -41,8 +42,9 @@ public class MeshDebug : MonoBehaviour
 		{
 			RaycastHit hit;
 			float rayLength = 0.1f;
-			Ray ray = new Ray(cp.point + cp.normal * rayLength * 0.5f, -cp.normal);
-			if (cp.thisCollider.Raycast(ray, out hit, rayLength))
+			Ray ray = new Ray(cp.point - cp.normal * rayLength * 0.5f, cp.normal);
+			//Debug.DrawRay(cp.point - cp.normal * rayLength, cp.normal, Color.red, 50, false);
+			if (_collider.Raycast(ray, out hit, rayLength))
 			{
 				colorList.Add(m_MainTexture.GetPixelBilinear(hit.textureCoord.x, hit.textureCoord.y));
 			}
