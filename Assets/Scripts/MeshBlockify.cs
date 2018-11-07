@@ -19,6 +19,8 @@ public class MeshBlockify : MonoBehaviour
 		mesh = GetComponent<MeshFilter>().mesh;
 		_collider = GetComponent<MeshCollider>();
 		_renderer = GetComponent<MeshRenderer>();
+
+		GameObject.Find("CameraFocus").transform.position = _renderer.bounds.center;
 		
 		
 		testObject.GetComponent<Block>().collisionEvent.AddListener(ObjectCollide);
