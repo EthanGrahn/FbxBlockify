@@ -57,12 +57,18 @@ public class MeshBlockify : MonoBehaviour
 		{
 			RaycastHit hit;
 			float rayLength = 0.1f;
-			Ray ray = new Ray(cp.point - cp.normal * rayLength * 0.5f, cp.normal);
+			Ray ray = new Ray(cp.point - cp.normal * rayLength, cp.normal);
 			//Debug.DrawRay(cp.point - cp.normal * rayLength, cp.normal, Color.red, 50, false);
 			if (_collider.Raycast(ray, out hit, rayLength))
 			{
 				colorList.Add(m_MainTexture.GetPixelBilinear(hit.textureCoord.x, hit.textureCoord.y));
 			}
+		}
+
+		if (colorList.Count == 0)
+		{
+			block.gameObject.SetActive(false);
+			return;
 		}
 
 		block.SetColor(AverageColors(colorList));
