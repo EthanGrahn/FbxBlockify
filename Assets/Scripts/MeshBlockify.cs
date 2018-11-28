@@ -65,12 +65,6 @@ public class MeshBlockify : MonoBehaviour
 
 	void Update()
 	{
-		if (Input.GetKeyDown(KeyCode.L))
-		{
-			baseCube = new SubCube(mFilter, Vector3.zero);
-			baseCube.SetPosition(testObject.transform.position + Vector3.up);
-			AddToMesh(baseCube.mFilter);
-		}
 	}
 
 	public void StartBlockify(int blockResolution, List<Block> blockList)
@@ -137,23 +131,17 @@ public class MeshBlockify : MonoBehaviour
 
 	private void AddToMesh(MeshFilter newMesh)
 	{
-		if (mFilter.sharedMesh == null)
-		{
-			mFilter = newMesh;
-			return;
-		}
-		
 		CombineInstance[] combine = new CombineInstance[2];
 		
-		combine[0].mesh = mFilter.mesh;
+		combine[0].mesh = mFilter.sharedMesh;
 		combine[0].transform = mFilter.gameObject.transform.localToWorldMatrix;
 		
-		combine[1].mesh = newMesh.mesh;
+		combine[1].mesh = newMesh.sharedMesh;
 		combine[1].transform = mFilter.gameObject.transform.localToWorldMatrix;
 		
 		Mesh combinedMesh = new Mesh();
-		combinedMesh.CombineMeshes(combine);
-		mFilter.mesh = combinedMesh;
+		combinedMesh.CombineMeshes(combine, false);
+		mFilter.sharedMesh = combinedMesh;
 	}
 
 	public Vector3[] SubdivideBounds(float objSize, Bounds bounds, float cubeExtent, int depth)
