@@ -43,6 +43,11 @@ public class Block : MonoBehaviour
 		StartCoroutine(CheckIfCollide());
 	}
 
+	public void Activate()
+	{
+		transform.parent.gameObject.SetActive(true);
+	}
+
 	private IEnumerator CheckIfCollide()
 	{
 		yield return new WaitForFixedUpdate();

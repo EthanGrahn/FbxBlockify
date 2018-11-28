@@ -35,11 +35,13 @@ public class BlockManager : MonoBehaviour {
 	private IEnumerator LoadBlocks()
 	{
 		yield return new WaitForFixedUpdate();
-		for (int i = 0; i < 4096; ++i)
-		{
-			blocks.Add(Instantiate(blockPrefab).transform.GetChild(0).GetComponent<Block>());
-			blocks[i].transform.parent.gameObject.SetActive(false);
-		}
+		//for (int i = 0; i < 2000000; ++i)
+		//{
+			//Instantiate(blockPrefab);
+			//blocks.Add(Instantiate(blockPrefab).transform.GetChild(0).GetComponent<Block>());
+			//blocks[i].transform.parent.gameObject.SetActive(false);
+		//}
+		yield return null;
 	}
 	
 	public void BlockifyObject(GameObject obj)

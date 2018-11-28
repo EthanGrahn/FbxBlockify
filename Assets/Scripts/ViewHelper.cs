@@ -20,13 +20,11 @@ public class ViewHelper : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 	
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		Debug.Log("enter");
 		MouseOver = true;
 	}
  
 	public void OnPointerExit(PointerEventData eventData)
 	{
-		Debug.Log("exit");
 		MouseOver = false;
 	}
 }
