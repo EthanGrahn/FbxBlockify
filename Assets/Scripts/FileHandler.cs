@@ -40,7 +40,7 @@ public class FileHandler : MonoBehaviour {
 			// Subscribe to OnFileSelect event (call SaveFileUsingPath using path) 
 			//fileBrowserScript.OnFileSelect += SaveFileUsingPath;
 		} else {
-			fileBrowserScript.OpenFilePanel(new string[] {"obj"});
+			fileBrowserScript.OpenFilePanel(new string[] {"fbx"});
 			// Subscribe to OnFileSelect event (call LoadFileUsingPath using path) 
 			fileBrowserScript.OnFileSelect += LoadObj;
 		}

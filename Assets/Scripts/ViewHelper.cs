@@ -8,16 +8,6 @@ public class ViewHelper : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
 	public static bool MouseOver = false;
 	
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-	
 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		MouseOver = true;

@@ -15,17 +15,10 @@ public class CombineUtility : MonoBehaviour
 	void Start ()
 	{
 		Instance = this;
+		helperCubeMesh.gameObject.SetActive(false);
 		
 		m_MeshFilter = GetComponent<MeshFilter>();
 		m_MeshFilter.mesh.name = "none";
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		if (Input.GetKeyDown(KeyCode.L))
-		{
-			CombineChildren();
-		}
 	}
 	
 	void CombineChildren()
@@ -59,6 +52,9 @@ public class CombineUtility : MonoBehaviour
 
 	public void AddCubeAtPosition(Vector3 pos, Color color)
 	{
+		if (!helperCubeMesh.gameObject.activeInHierarchy)
+			helperCubeMesh.gameObject.SetActive(true);
+		
 		List<Color> colors = Enumerable.Repeat(color, helperCubeMesh.mesh.vertices.Length).ToList();
 		helperCubeMesh.mesh.SetColors(colors);
 
@@ -69,5 +65,11 @@ public class CombineUtility : MonoBehaviour
 	public void SetCubeSize(float scale)
 	{
 		helperCubeMesh.transform.localScale = Vector3.one * scale;
+	}
+
+	public void Reset()
+	{
+		m_MeshFilter.mesh.Clear();
+		helperCubeMesh.gameObject.SetActive(false);
 	}
 }

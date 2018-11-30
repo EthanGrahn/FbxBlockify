@@ -13,7 +13,6 @@ public class Block : MonoBehaviour
 
 	public BlockEvent collisionEvent;
 
-	private bool collides = false;
 	private Vector3 prevPosition = Vector3.negativeInfinity;
 
 	private void Start()
@@ -23,8 +22,6 @@ public class Block : MonoBehaviour
 
 	private void OnCollisionEnter(Collision other)
 	{
-		//Debug.Log("collision interior");
-		collides = true;
 		collisionEvent.Invoke(other, this);
 	}
 
@@ -37,11 +34,6 @@ public class Block : MonoBehaviour
 		}
 	}
 
-	public void SetColor(Color color)
-	{
-		GetComponent<MeshRenderer>().material.color = color;
-	}
-
 	public void SetSize(float size)
 	{
 		transform.localScale = Vector3.one * size;
@@ -50,18 +42,5 @@ public class Block : MonoBehaviour
 	public void SetPosition(Vector3 position)
 	{
 		transform.parent.position = position;
-		//StartCoroutine(CheckIfCollide());
-	}
-
-	public void Activate()
-	{
-		transform.parent.gameObject.SetActive(true);
-	}
-
-	private IEnumerator CheckIfCollide()
-	{
-		yield return new WaitForFixedUpdate();
-		if (!collides)
-			transform.parent.gameObject.SetActive(false);
 	}
 }

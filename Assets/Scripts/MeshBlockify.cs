@@ -6,40 +6,14 @@ using UnityEngine;
 
 public class MeshBlockify : MonoBehaviour
 {
-	private struct SubCube
-	{
-		public SubCube(MeshFilter m, Vector3 c)
-		{
-			mFilter = m;
-			center = c;
-		}
-		
-		public MeshFilter mFilter;
-		public Vector3 center;
-
-		public void SetPosition(Vector3 newPosition)
-		{
-			List<Vector3> newVerts = new List<Vector3>();
-			newVerts.AddRange(mFilter.mesh.vertices);
-			for (int i = 0; i < mFilter.mesh.vertices.Length; ++i)
-			{
-				newVerts.Add(mFilter.mesh.vertices[i] + (center - newPosition));
-			}
-			
-			mFilter.mesh.SetVertices(newVerts);
-			center = newPosition;
-		}
-	}
-	
 	private MeshFilter mFilter;
 	public GameObject testObject;
 
 	private Texture2D m_MainTexture;
 	private MeshCollider _collider;
 	private MeshRenderer _renderer;
-	private List<Block> blocks = new List<Block>();
-	private List<SubCube> meshCubes = new List<SubCube>();
-	private SubCube baseCube;
+	public bool pause = false;
+	public bool reset = false;
 	
 	// Use this for initialization
 	void Start ()
@@ -48,28 +22,14 @@ public class MeshBlockify : MonoBehaviour
 		_renderer = GetComponent<MeshRenderer>();
 
 		GameObject.Find("CameraFocus").transform.position = _renderer.bounds.center;
-
-//		MeshFilter _mFilter = testObject.GetComponent<MeshFilter>();
-//		mFilter = _mFilter;
-//		Vector3 _center = testObject.GetComponent<MeshRenderer>().bounds.center;
-//		baseCube = new SubCube(_mFilter, _center);
-		//meshCubes.Add(baseCube);
-		//AddToMesh(baseCube.mFilter);
 		
-		
-		//testObject.GetComponent<Block>().collisionEvent.AddListener(ObjectCollide);
 		m_MainTexture = _renderer.material.mainTexture as Texture2D;
 		if (m_MainTexture == null)
 			Debug.Log("main texture is null");
 	}
 
-	void Update()
+	public void StartBlockify(int blockResolution)
 	{
-	}
-
-	public void StartBlockify(int blockResolution, List<Block> blockList)
-	{
-		blocks = blockList;
 		StartCoroutine(AssignBlocks(blockResolution));
 	}
 
@@ -81,29 +41,21 @@ public class MeshBlockify : MonoBehaviour
 		
 		Vector3[] locations = SubdivideBounds(testObjectSize, _renderer.bounds, cubeExtents, blockResolution);
 
-		Block previousBlock = null;
 		Block block = Instantiate(testObject).transform.GetChild(0).GetComponent<Block>();
 		yield return new WaitForFixedUpdate();
 		block.collisionEvent.AddListener(ObjectCollide);
 		block.SetSize(testObjectSize);
 		
-		for (int i = 0; i < locations.Length; ++i)
+		for (int i = 0; i < locations.Length && !reset; ++i)
 		{
-//			if (previousBlock == null || previousBlock.transform.parent.gameObject.activeInHierarchy)
-//			{
-//				block = Instantiate(testObject).transform.GetChild(0).GetComponent<Block>();
-//				previousBlock = block;
-//			}
-//			else
-//			{
-//				previousBlock.Activate();
-//				block = previousBlock;
-//			}
-			//blocks[i].transform.parent.gameObject.SetActive(true);
+			ProgressBar.Instance.UpdateProgress(i / (float)locations.Length);
 			block.SetPosition(locations[i]);
-			//yield return new WaitForFixedUpdate();
 			yield return new WaitForFixedUpdate();
+			yield return new WaitUntil(() => !pause || reset);
 		}
+		
+		Destroy(block.gameObject);
+		GameObject.FindObjectOfType<BlockManager>().StopProcessing();
 	}
 
 	private void ObjectCollide(Collision other, Block block)
@@ -122,12 +74,8 @@ public class MeshBlockify : MonoBehaviour
 		}
 
 		if (colorList.Count == 0)
-		{
-			//block.gameObject.SetActive(false);
 			return;
-		}
 
-		//block.SetColor(AverageColors(colorList));
 		CombineUtility.Instance.AddCubeAtPosition(block.transform.position, AverageColors(colorList));
 	}
 
@@ -150,14 +98,12 @@ public class MeshBlockify : MonoBehaviour
 	{
 		Debug.Log(depth);
 		List<Vector3> positions = new List<Vector3>();
-		float xStart = bounds.center.x - cubeExtent;
-		float yStart = bounds.center.y - cubeExtent;
-		float zStart = bounds.center.z - cubeExtent;
-		float xEnd = bounds.center.x + cubeExtent - objSize;
-		float yEnd = bounds.center.y + cubeExtent - objSize;
-		float zEnd = bounds.center.z + cubeExtent - objSize;
-		
-		int count = 0;
+		float xStart = bounds.center.x - cubeExtent - objSize;
+		float yStart = bounds.center.y - cubeExtent - objSize;
+		float zStart = bounds.center.z - cubeExtent - objSize;
+		float xEnd = bounds.center.x + cubeExtent;
+		float yEnd = bounds.center.y + cubeExtent;
+		float zEnd = bounds.center.z + cubeExtent;
 		
 		for (float x = xStart; x < xEnd; x += objSize)
 		{
@@ -166,7 +112,6 @@ public class MeshBlockify : MonoBehaviour
 				for (float z = zStart; z < zEnd; z += objSize)
 				{
 					positions.Add(new Vector3(x, y, z));
-					count++;
 				}
 			}
 		}

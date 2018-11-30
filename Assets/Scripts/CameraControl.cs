@@ -13,7 +13,7 @@ public class CameraControl : MonoBehaviour
 	void Start ()
 	{
 		cm = GetComponent<CinemachineFreeLook>();
-		GameObject.Find("SensSlider").GetComponent<Slider>().onValueChanged.AddListener(SensChanged);
+		GameObject.Find("ZoomSensSlider").GetComponent<Slider>().onValueChanged.AddListener(SensChanged);
 		//cm.enabled = false;
 	}
 
@@ -36,9 +36,14 @@ public class CameraControl : MonoBehaviour
 			cm.m_YAxis.m_InputAxisName = "";
 		}
 
-		if (Input.GetAxis("Mouse ScrollWheel") != 0)
+		if (Input.GetAxis("Mouse ScrollWheel") < 0)
 		{
-			cm.m_Lens.FieldOfView += Input.GetAxis("Mouse ScrollWheel") * sensMultiplier;
+			cm.m_Lens.FieldOfView += sensMultiplier;
+			cm.m_Lens.FieldOfView = Mathf.Clamp(cm.m_Lens.FieldOfView, 5, 100);
+		}
+		else if (Input.GetAxis("Mouse ScrollWheel") > 0)
+		{
+			cm.m_Lens.FieldOfView -= sensMultiplier;
 			cm.m_Lens.FieldOfView = Mathf.Clamp(cm.m_Lens.FieldOfView, 5, 100);
 		}
 	}

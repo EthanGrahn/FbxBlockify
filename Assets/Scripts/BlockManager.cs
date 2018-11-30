@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BlockManager : MonoBehaviour {
 
@@ -15,41 +17,67 @@ public class BlockManager : MonoBehaviour {
 	}
 
 	public BlockResolution blockResolution = BlockResolution.SIXTEEN;
-	public GameObject blockPrefab;
 	public GameObject model;
-	
-	private List<Block> blocks = new List<Block>();
-	
-	// Use this for initialization
-	void Start ()
+
+	private Button prevButton;
+	private bool processing = false;
+	private MeshBlockify mBlockify;
+
+	void Start()
 	{
-		StartCoroutine(LoadBlocks());
+		prevButton = GameObject.Find("Res16").GetComponent<Button>();
+	}
+	
+	public void BlockifyObject()
+	{
+		if (!processing)
+		{
+			GameObject.Find("BlockifyButton").GetComponent<Button>().interactable = false;
+			processing = true;
+			if (!(mBlockify = model.GetComponent<MeshBlockify>()))
+				mBlockify = model.AddComponent<MeshBlockify>();
+
+			mBlockify.StartBlockify((int) blockResolution);
+		}
 	}
 
-	void Update()
+	public void ChooseResolution(Button button)
 	{
-		if (Input.GetKeyDown(KeyCode.Space))
-			BlockifyObject(model);
+		button.interactable = false;
+		prevButton.interactable = true;
+		prevButton = button;
+		blockResolution = (BlockResolution)int.Parse(button.name.Substring(3));
 	}
 
-	private IEnumerator LoadBlocks()
+	public void StopProcessing()
 	{
-		yield return new WaitForFixedUpdate();
-		//for (int i = 0; i < 2000000; ++i)
-		//{
-			//Instantiate(blockPrefab);
-			//blocks.Add(Instantiate(blockPrefab).transform.GetChild(0).GetComponent<Block>());
-			//blocks[i].transform.parent.gameObject.SetActive(false);
-		//}
-		yield return null;
+		mBlockify.reset = false;
+		mBlockify.pause = false;
+		processing = false;
+		GameObject.Find("BlockifyButton").GetComponent<Button>().interactable = true;
 	}
-	
-	public void BlockifyObject(GameObject obj)
+
+	public void TogglePause()
 	{
-		MeshBlockify mBlockify;
-		if (!(mBlockify = obj.GetComponent<MeshBlockify>()))
-			mBlockify = obj.AddComponent<MeshBlockify>();
-		
-		mBlockify.StartBlockify((int)blockResolution, blocks);
+		if (mBlockify != null)
+		{
+			mBlockify.pause = !mBlockify.pause;
+
+			if (mBlockify.pause)
+				GameObject.Find("PauseText").GetComponent<TextMeshProUGUI>().text = "Continue";
+			else
+				GameObject.Find("PauseText").GetComponent<TextMeshProUGUI>().text = "Pause";
+		}
+	}
+
+	public void Reset()
+	{
+		if (mBlockify != null)
+		{
+			ProgressBar.Instance.Reset();
+			GameObject.Find("PauseText").GetComponent<TextMeshProUGUI>().text = "Pause";
+			mBlockify.reset = true;
+			CombineUtility.Instance.Reset();
+		}
 	}
 }
