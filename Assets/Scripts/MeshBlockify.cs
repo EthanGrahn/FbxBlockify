@@ -49,10 +49,10 @@ public class MeshBlockify : MonoBehaviour
 
 		GameObject.Find("CameraFocus").transform.position = _renderer.bounds.center;
 
-		MeshFilter _mFilter = testObject.GetComponent<MeshFilter>();
-		mFilter = _mFilter;
-		Vector3 _center = testObject.GetComponent<MeshRenderer>().bounds.center;
-		baseCube = new SubCube(_mFilter, _center);
+//		MeshFilter _mFilter = testObject.GetComponent<MeshFilter>();
+//		mFilter = _mFilter;
+//		Vector3 _center = testObject.GetComponent<MeshRenderer>().bounds.center;
+//		baseCube = new SubCube(_mFilter, _center);
 		//meshCubes.Add(baseCube);
 		//AddToMesh(baseCube.mFilter);
 		
@@ -77,30 +77,31 @@ public class MeshBlockify : MonoBehaviour
 	{
 		float cubeExtents = Mathf.Max(new float[] {_renderer.bounds.extents.x, _renderer.bounds.extents.y, _renderer.bounds.extents.z});
 		float testObjectSize = (cubeExtents * 2f) / blockResolution;
+		CombineUtility.Instance.SetCubeSize(testObjectSize);
 		
 		Vector3[] locations = SubdivideBounds(testObjectSize, _renderer.bounds, cubeExtents, blockResolution);
-		yield return new WaitForFixedUpdate();
 
 		Block previousBlock = null;
+		Block block = Instantiate(testObject).transform.GetChild(0).GetComponent<Block>();
+		yield return new WaitForFixedUpdate();
+		block.collisionEvent.AddListener(ObjectCollide);
+		block.SetSize(testObjectSize);
 		
 		for (int i = 0; i < locations.Length; ++i)
 		{
-			Block block;
-			if (previousBlock == null || previousBlock.transform.parent.gameObject.activeInHierarchy)
-			{
-				block = Instantiate(testObject).transform.GetChild(0).GetComponent<Block>();
-				previousBlock = block;
-			}
-			else
-			{
-				previousBlock.Activate();
-				block = previousBlock;
-			}
+//			if (previousBlock == null || previousBlock.transform.parent.gameObject.activeInHierarchy)
+//			{
+//				block = Instantiate(testObject).transform.GetChild(0).GetComponent<Block>();
+//				previousBlock = block;
+//			}
+//			else
+//			{
+//				previousBlock.Activate();
+//				block = previousBlock;
+//			}
 			//blocks[i].transform.parent.gameObject.SetActive(true);
-			yield return new WaitForFixedUpdate();
-			block.collisionEvent.AddListener(ObjectCollide);
-			block.SetSize(testObjectSize);
 			block.SetPosition(locations[i]);
+			//yield return new WaitForFixedUpdate();
 			yield return new WaitForFixedUpdate();
 		}
 	}
@@ -122,11 +123,12 @@ public class MeshBlockify : MonoBehaviour
 
 		if (colorList.Count == 0)
 		{
-			block.gameObject.SetActive(false);
+			//block.gameObject.SetActive(false);
 			return;
 		}
 
-		block.SetColor(AverageColors(colorList));
+		//block.SetColor(AverageColors(colorList));
+		CombineUtility.Instance.AddCubeAtPosition(block.transform.position, AverageColors(colorList));
 	}
 
 	private void AddToMesh(MeshFilter newMesh)

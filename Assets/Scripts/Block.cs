@@ -14,6 +14,7 @@ public class Block : MonoBehaviour
 	public BlockEvent collisionEvent;
 
 	private bool collides = false;
+	private Vector3 prevPosition = Vector3.negativeInfinity;
 
 	private void Start()
 	{
@@ -25,6 +26,15 @@ public class Block : MonoBehaviour
 		//Debug.Log("collision interior");
 		collides = true;
 		collisionEvent.Invoke(other, this);
+	}
+
+	private void OnCollisionStay(Collision other)
+	{
+		if (transform.position != prevPosition)
+		{
+			prevPosition = transform.position;
+			collisionEvent.Invoke(other, this);
+		}
 	}
 
 	public void SetColor(Color color)
@@ -40,7 +50,7 @@ public class Block : MonoBehaviour
 	public void SetPosition(Vector3 position)
 	{
 		transform.parent.position = position;
-		StartCoroutine(CheckIfCollide());
+		//StartCoroutine(CheckIfCollide());
 	}
 
 	public void Activate()
